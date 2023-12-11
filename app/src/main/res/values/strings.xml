@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">TODO APP</string>
+    <string name="categoria_string">CATEGORIES:</string>
+    <string name="task_string">TASKS:</string>
+    <string name="add_category">Add Category</string>
+    <string name="add_task">Add Task</string>
+    <string name="uniTask"> University </string>
+    <string name="personalTask">Personal</string>
+    <string name="otherTask">Other</string>
+</resources>

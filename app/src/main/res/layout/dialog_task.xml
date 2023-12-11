@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="250dp"
+    android:layout_height="wrap_content"
+    android:background="@color/todo_background_todo_app"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+
+    <EditText
+        android:id="@+id/etTask"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        android:hint="@string/add_task"
+        android:fontFamily="monospace"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white" />
+
+    <RadioGroup
+        android:id="@+id/rgCategories"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RadioButton
+            android:id="@+id/rbToDo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:buttonTint="@color/todo_uni_category"
+            android:checked="true"
+            android:text="@string/uniTask"
+            android:fontFamily="monospace"
+            android:textColor="@color/white" />
+
+        <RadioButton
+            android:id="@+id/rbDoing"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:buttonTint="@color/todo_personal_category"
+            android:text="@string/personalTask"
+            android:fontFamily="monospace"
+            android:textColor="@color/white" />
+
+        <RadioButton
+            android:id="@+id/rbDone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:buttonTint="@color/todo_other_category"
+            android:text="@string/otherTask"
+            android:textColor="@color/white" />
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/btnAddTask"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/todo_accent"
+        android:fontFamily="monospace"
+        android:text="@string/add_task" />
+
+</LinearLayout>
