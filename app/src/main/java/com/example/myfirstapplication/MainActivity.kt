@@ -3,12 +3,18 @@ package com.example.myfirstapplication
 import android.app.Dialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.util.*
 import android.widget.*
-import androidx.appcompat.widget.*
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.myfirstapplication.data.DataTask
+import com.example.myfirstapplication.presentation.TaskViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.util.Timer
+import java.util.TimerTask
 
 class MainActivity : AppCompatActivity() {
     private lateinit var rvCategories: RecyclerView
@@ -17,14 +23,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tasksAdapter: TasksAdapter
     private lateinit var fabAddTask: FloatingActionButton
 
-    private val categories = listOf(
+    val categories = listOf(
         TaskCategory.UNIVERSITY, TaskCategory.PERSONAL, TaskCategory.OTHER
     )
 
-    val tasks = mutableListOf<Task>(
+    private lateinit var taskViewModel: TaskViewModel
 
-    )
-
+    private lateinit var tasks: List<DataTask>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,8 +67,7 @@ class MainActivity : AppCompatActivity() {
                 else -> TaskCategory.OTHER
             }
 
-            tasks.add(Task(currentTask, currentCategory))
-            updateTasks()
+            taskViewModel.addTask(DataTask(currentTask, currentCategory))
             dialog.hide()
         }
         dialog.show()
@@ -72,6 +76,8 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun initComponent() {
+
+        taskViewModel = ViewModelProvider(this).get(TaskViewModel::class.java)
         rvCategories = findViewById<RecyclerView>(R.id.rvCategories)
         rvTasks = findViewById<RecyclerView>(R.id.rvTasks)
         fabAddTask = findViewById<FloatingActionButton>(R.id.fabAddTask)
@@ -79,31 +85,52 @@ class MainActivity : AppCompatActivity() {
 
     private fun initUI() {
         categoriesAdapter = CategoriesAdapter(categories, ::onCategorySelected)
-        tasksAdapter = TasksAdapter(tasks, ::onTaskSelected)
+        tasksAdapter = TasksAdapter(::onTaskSelected, categories)
+        taskViewModel.tasks.observe(this, Observer { task ->
+            tasksAdapter.setData(task, categories)
+            this.tasks = task
+            val handler = android.os.Handler()
+            handler.postDelayed({
+                val selectedTasks = task.filter { it.isSelected }
+                // erase selected tasks
+                selectedTasks.forEach {
+                    deleteTaskFromDatabase(it.id)
+                }
+            },100)
+        })
         rvCategories.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         rvCategories.adapter = categoriesAdapter
         rvTasks.layoutManager = LinearLayoutManager(this)
         rvTasks.adapter = tasksAdapter
 
+        Log.i("MainActivity", "UI initialized")
+
     }
 
     private fun onTaskSelected(position: Int) {
-        tasks[position].isSelected = !tasks[position].isSelected
-        updateTasks()
+        val selectedCategories = categories.filter { !it.isSelected }
+        val newTasks = tasks.filter { selectedCategories.contains(it.category) }
+        val task = newTasks[position]
+        taskViewModel.updateTask(task.id, !task.isSelected)
     }
 
     private fun onCategorySelected(position: Int) {
         categories[position].isSelected = !categories[position].isSelected
         categoriesAdapter.notifyItemChanged(position)
-        updateTasks()
+        tasksAdapter.setData(tasks, categories)
+
+
     }
 
 
-    private fun updateTasks() {
-        val selectedCategories = categories.filter { !it.isSelected }
-        val newTasks = tasks.filter { selectedCategories.contains(it.category) }
-        tasksAdapter.tasks = newTasks
-        tasksAdapter.notifyDataSetChanged()
+    private fun deleteTaskFromDatabase(id: Int) {
+        taskViewModel.deleteTask(id)
+        Log.i("MainActivity", "Task deleted")
+    }
+
+    private fun cleanTaskDatabase() {
+        taskViewModel.cleanDatabase()
+        Log.i("MainActivity", "Database cleaned")
     }
 }

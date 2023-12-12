@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TODO APP</string>
+    <string name="app_name">TO-DO APP</string>
     <string name="categoria_string">CATEGORIES:</string>
     <string name="task_string">TASKS:</string>
     <string name="add_category">Add Category</string>
